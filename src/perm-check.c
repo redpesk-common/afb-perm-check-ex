@@ -47,6 +47,7 @@ AFB_EXTENSION("PERM-CHECK")
 static const char *api_name = DEFAULT_API_NAME;
 static const char *verb_name = DEFAULT_VERB_NAME;
 static const char *scope_name = NULL;
+static int disabled = 0;
 
 /* description of configuration options */
 const struct argp_option AfbExtensionOptionsV1[] = {
@@ -59,8 +60,19 @@ const struct argp_option AfbExtensionOptionsV1[] = {
 	{ .name="perm-check-scope", .key='s', .arg="NAME",
 		.doc="Set scope of the declared API" },
 
+	{ .name="perm-check-disabled", .key='d', .arg=NULL,
+		.doc="Disable the extension" },
+
 	{ .name=0, .key=0, .doc=0 }
 };
+
+/* returns true if key exists and is a boolean true */
+static int is_set(struct json_object *config, const char *key)
+{
+	struct json_object *value;
+	return json_object_object_get_ex(config, key, &value)
+		&& json_object_get_boolean(value);
+}
 
 /* set the target with the string value if key exists
  * returns 1 if exist or 0 if not existing  */
@@ -77,9 +89,11 @@ static int set_if_exist(struct json_object *config, const char *key, const char 
 int AfbExtensionConfigV1(void **data, struct json_object *config, const char *uid)
 {
 	LIBAFB_NOTICE("Extension %s got config %s", AfbExtensionManifest.name, json_object_get_string(config));
+
 	set_if_exist(config, "perm-check-api", &api_name, 1);
 	set_if_exist(config, "perm-check-verb", &verb_name, 1);
 	set_if_exist(config, "perm-check-scope", &scope_name, 1);
+	disabled = is_set(config, "perm-check-disabled");
 	return 0;
 }
 
@@ -101,6 +115,11 @@ int AfbExtensionDeclareV1(void *data, struct afb_apiset *declare_set, struct afb
 	int rc;
 	struct afb_api_item aai;
 	struct afb_apiset *ds;
+
+	if (disabled) {
+		LIBAFB_NOTICE("Extension %s is disabled", AfbExtensionManifest.name);
+		return 0;
+	}
 
 	LIBAFB_NOTICE("Registering extension %s for API %s VERB %s SCOPE %s",
 			AfbExtensionManifest.name, api_name, verb_name,
