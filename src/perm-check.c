@@ -216,6 +216,8 @@ static void check_async_callback(void *closure, int status)
 {
 	struct afb_req_common *req = closure;
 
+	LIBAFB_DEBUG("perm-check result %d", status);
+
 	/* normalize status */
 	if (status == AFB_ERRNO_UNKNOWN_API)
 		status = AFB_ERRNO_NOT_AVAILABLE;
@@ -239,7 +241,12 @@ static void process_permission_check_request(void *closure, struct afb_req_commo
 		afb_req_common_reply_hookable(req, AFB_ERRNO_INVALID_REQUEST, 0, 0);
 
 	/* ok then cwasynchronous check of the permission */
-	else
+	else {
+		LIBAFB_DEBUG("perm-check for c=%s u=%s s=%s p=%s",
+			values.client,
+			values.user,
+			values.session,
+			values.permission);
 		afb_perm_check_async(
 			values.client,
 			values.user,
@@ -247,5 +254,6 @@ static void process_permission_check_request(void *closure, struct afb_req_commo
 			values.permission,
 			check_async_callback,
 			afb_req_common_addref(req));
+	}
 }
 
