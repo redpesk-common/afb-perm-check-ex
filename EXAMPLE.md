@@ -6,24 +6,24 @@ to bring the permission check feature of AFB framework to clients
 that are not inserted in the framework but that trust to use it
 for permission checking.
 
-So let explore that example.
+So let's explore that example.
 
 ## Description of the example
 
-An edge equipement is running a on a MCU too smal to
-handle permission logic. That equipement is securely connected
+An edge equipment is running a on an MCU too small to
+handle permission logic. That equipment is securely connected
 using a trusted connection to a server that can check the
 permissions using cynagora service.
 
-In that example, the MCU leverage afb-zephyr items that natively
+In that example, the MCU leverages afb-zephyr items that natively
 integrates redpesk framework permission checking. That native
 permission check is compiled in a such way that instead of calling
-directly cynagora service calls a redpesk API for checking the
+directly cynagora service it calls a redpesk API for checking the
 permission.
 
-Because redpesk APIs can be distribute across machines, the
+Because redpesk APIs can be distributed across machines, the
 effective service of permission check is done on the remote
-machine by querying cynagora service and by transfering the
+machine by querying cynagora service and by transferring the
 answer to the original requester.
 
 Below figure shows that:
@@ -48,8 +48,8 @@ application        afb-zephyr       NETWORK         afb-binder  afb-perm-check-e
 In detail:
 
 1. The original query is either: (a) an automatic query resulting from
-   the declaration of a required permission for a verb, or, (b) an
-   explict query performed using framework API (`afb_req_check_permission`)
+   the declaration of a required permission for a verb, or (b) an
+   explicit query performed using framework API (`afb_req_check_permission`)
 
 2. When the framework library afb-zephyr receives the request to check the
    permission, it translates the request to a call to the API `perm`, VERB
@@ -59,51 +59,51 @@ In detail:
 3. The request is received and processed by the loadable binder extension
    `afb-perm-check-ext`.
 
-4. The extension use `afb-libafb` internals to check the permission using
+4. The extension uses `afb-libafb` internals to check the permission using
    `cynagora`.
 
 The remaining of this document explains four things:
 
-1. What are redpesk permissions, how it is used and what it expects.
+1. What are redpesk permissions, how they are used and what they expect
 
 2. Compiling the zephyr example
 
-3. The setting up of the example.
+3. Setting up the example
 
 4. Testing and playing with the example
 
 ## Dealing with redpesk permissions
 
-Within redpesk, check of permissions implies that the client is trusted.
+Within redpesk, checking the permissions implies that the client is trusted.
 When running on redpesk, the client is identified by its SMACK label
 that is guaranteed by Linux kernel.
 
 When the client runs on a remote platform, it can not be trusted using SMACK
-label. Instead, the client must identify itself with a token and that token
+labels. Instead, the client must identify itself with a token and that token
 must be validated by the permission framework cynagora. This is achieved by checking
 that the permission `urn:redpesk:token:valid` is granted to the token used as cynagora
-session. In other word, a client presenting the token *TOKEN* is trusted if a cynagora
+session. In other words, a client presenting the token *TOKEN* is trusted if a cynagora
 rule `* TOKEN * urn:redpesk:token:valid yes` exists.
 
 When the client is trusted, the permissions are checked using the same principles.
 When the client runs on the same redpesk OS, the SMACK label can be used.
-Otherwise, the token is used as session for checking the permissions.
+Otherwise, the token is used as a session for checking the permissions.
 
 
 ## Compiling the zephyr example
 
 The project [afb-zephyr-samples](https://github.com/redpesk-samples/afb-zephyr-samples)
-contains sample applications for integration of redpeskframework and zephyr OS.
+contains sample applications for integration of redpesk framework and zephyr OS.
 
 The example **remote-io-control** when compiled with `CHECK_PERM` defined to be 1
 (see file `remote-io-control/src/main.c` line 63) adds feature to check the client permission
 when the client calls the verb `login`.
 
 Instead of using DNS, the example use a fixed IP address. That address is
-controled by the macro `PREM_CHECK_IP` and can be set near line 70 of
+controlled by the macro `PREM_CHECK_IP` and can be set near line 70 of
 file `remote-io-control/src/main.c`
 
-The compilation zephyr samples is described in README files.
+Compilation of the zephyr samples is described in README files.
 It requires the zephyr module [afb-zephyr](https://github.com/redpesk-core/afb-zephyr)
 
 
@@ -137,7 +137,7 @@ cynagora-admin set '*' CANWRITE '*' urn:redpesk:zephyr:partner:writer yes
 
 The session serves as security token so the client identifier and the user identifier
 can be anything. That is the meaning of the stars. Take care that stars might be expanded
-by the shell to the list of files in the current directory and then must be in quotes.
+by the shell to the list of files in the current directory and as such must be in quotes.
 
 
 ### Start the permission checker service
@@ -145,17 +145,17 @@ by the shell to the list of files in the current directory and then must be in q
 The command `afb-binder` is the redpesk binder, it is provided by [redpesk SDK](
 https://docs.redpesk.bzh/docs/en/master/getting_started/host-configuration/docs/0-build-microservice-overview.html).
 
-The service that checks permissions is here run in a separate instance, showing that
-the management of permissions can be on an instance different of the client instance.
+The service that checks permissions is here ran in a separate instance, showing that
+the management of permissions can be on an instance different than the client instance.
 
 The permission checker runs as a binder extension. It must be compiled from
 the present project. It is loaded in the binder using the option `--extension`.
 
 By default, it provides the API *perm* with the single verb *check*. That API is
-exported in RPC on TCP port 4444 using the option '--rpc-server'.
+exported in RPC on TCP port 4444 using the option `--rpc-server`.
 
 ```
-afb-binder -p 3333 --extension libafb-perm-check-ext.so --rpc-server tcp:*:4444/perm
+afb-binder -p 3333 --extension libafb-perm-check-ext.so --rpc-server 'tcp:*:4444/perm'
 ```
 
 ### Start zephyr
@@ -163,7 +163,7 @@ afb-binder -p 3333 --extension libafb-perm-check-ext.so --rpc-server tcp:*:4444/
 Once you have compiled zephyr example (see above), you should flash
 it to the target board (using `west flash`).
 
-Then to sart zephyr, simply reset or boot the board.
+Then to start zephyr, simply reset or boot the board.
 
 
 ## Testing and playing the example
@@ -183,10 +183,10 @@ afb-binder --port 1111 --rpc-client=tcp:XXXXXX:1234/zephyr
 
 Where `XXXXXX` is the IP of the board.
 
-This command tells to export as API zephyr the API replying at RPC
+This command tells to export as API zephyr the API replying in RPC
 protocol on port 1234 of IP XXXXXX.
 
-The binder then serves using protocol WSAPI at port 1111 and forward to
+The binder then serves using protocol WSAPI at port 1111 and forwards to
 the board at `tcp:XXXXXX:1234` the calls to API **zephyr**.
 
 ### Test and play the example
@@ -202,8 +202,8 @@ Where `TOKEN` is the security token that presents the client.
 That token is used when checking permissions.
 
 So to play the example, we should use the predefined tokens
-`CANREAD` for being allowed to read, or, `CANWRITE` for being
-allowed to write, or, any other value (like `CANT`) that can not
+`CANREAD` for being allowed to read, or `CANWRITE` for being
+allowed to write, or any other value (like `CANT`) that cannot
 do anything.
 
 For example:
@@ -223,7 +223,7 @@ zephyr led toggle
 zephyr logoff
 ```
 
-The verb `state` require to be trusted. It just need the permission `urn:redpesk:token:valid`.
+The verb `state` require to be trusted. It just needs the permission `urn:redpesk:token:valid`.
 
 The verb `led` with the argument `toggle` requires to be trusted
 (permission `urn:redpesk:token:valid`) and to have the permission
@@ -243,5 +243,5 @@ How would do it using AFB settings?
 
 Useful links:
 
-- afb-binder manual https://docs.redpesk.bzh/docs/en/master/redpesk-os/afb-binder/afb-binder.1.html
-- call-extern-api example https://github.com/redpesk-samples/afb-zephyr-samples/tree/master/call-extern-api
+- afb-binder manual <https://docs.redpesk.bzh/docs/en/master/redpesk-os/afb-binder/afb-binder.1.html>
+- call-extern-api example <https://github.com/redpesk-samples/afb-zephyr-samples/tree/master/call-extern-api>
