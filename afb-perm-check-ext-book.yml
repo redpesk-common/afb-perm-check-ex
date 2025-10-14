@@ -1,0 +1,15 @@
+type: books
+books:
+-
+    id: afb_perm_check_ext
+    title: PERM-CHECK extension
+    description: Binder extension for permission checking
+    keywords:
+    author: "IotBzh"
+    version: master
+    chapters:
+    - url: README.md
+      name: Overview
+    - url: EXAMPLE.md
+      name: Example
+
