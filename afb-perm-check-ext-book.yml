@@ -11,5 +11,5 @@ books:
     - url: README.md
       name: Overview
     - url: EXAMPLE.md
-      name: Example
+      name: Example for Zephyr permission check
 

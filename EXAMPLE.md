@@ -1,5 +1,5 @@
 
-# Example of use of permission check extension
+# Example of use for checking permission within zephyr
 
 The permission check extension, named `PREM-CHECK` is intended
 to bring the permission check feature of AFB framework to clients
