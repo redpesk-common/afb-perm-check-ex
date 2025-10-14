@@ -186,7 +186,7 @@ static int extract_values(values_t *values, struct afb_req_common *req)
 	struct json_object *jval;
 
 	/* positional STRINGZ parameters: CLIENT USER SESSION PERMISSION */
-	if (req->params.ndata == 4
+	if (req->params.ndata >= 4
 	 && afb_data_type(req->params.data[0]) == &afb_type_predefined_stringz 
 	 && afb_data_type(req->params.data[1]) == &afb_type_predefined_stringz 
 	 && afb_data_type(req->params.data[2]) == &afb_type_predefined_stringz 
@@ -205,10 +205,23 @@ static int extract_values(values_t *values, struct afb_req_common *req)
 
 	/* yes, try extraction */
 	jval = afb_data_ro_pointer(req->params.data[0]);
-	return (set_if_exist(jval, "client", &values->client, 0)
-	     && set_if_exist(jval, "user", &values->user, 0)
-	     && set_if_exist(jval, "session", &values->session, 0)
-	     && set_if_exist(jval, "permission", &values->permission, 0)) - 1;
+	switch (json_object_get_type(jval)) {
+	case json_type_array:
+		if (json_object_array_length(jval) < 4)
+			return -1;
+		values->client = json_object_get_string(json_object_array_get_idx(jval, idx_client));
+		values->user = json_object_get_string(json_object_array_get_idx(jval, idx_user));
+		values->session = json_object_get_string(json_object_array_get_idx(jval, idx_session));
+		values->permission = json_object_get_string(json_object_array_get_idx(jval, idx_permission));
+		return 0;
+	case json_type_object:
+		return (set_if_exist(jval, "client", &values->client, 0)
+		     && set_if_exist(jval, "user", &values->user, 0)
+		     && set_if_exist(jval, "session", &values->session, 0)
+		     && set_if_exist(jval, "permission", &values->permission, 0)) - 1;
+	default:
+		return -1;
+	}
 }
 
 /* callback of the asynchronous permission check */
