@@ -1,8 +1,10 @@
 # Permission Checking API extension for libafb
 
-AFB micro-service for querying cynagora permissions
+AFB extension for querying cynagora permissions
 
 ## Usage
+
+Exemple of use within `afb-binder`:
 
 ```bash
 afb-binder --name=perm-check --verbose \
