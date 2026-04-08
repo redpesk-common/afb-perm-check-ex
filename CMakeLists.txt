@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.15)
 
 project(afb-perm-check-ext
-	VERSION 0.0
+	VERSION 0.1.0
 	DESCRIPTION "Provide permission check API"
 	HOMEPAGE_URL "https://github.com/redpesk-common/afb-perm-check-ext"
 	LANGUAGES C
