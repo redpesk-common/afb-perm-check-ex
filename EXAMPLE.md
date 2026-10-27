@@ -199,7 +199,7 @@ afb-client -t TOKEN localhost:1111/api
 ```
 
 where `TOKEN` is the security token presented by the client.
-That token is used when checking permissions.
+This token is used when checking permissions.
 
 To run the example, we should use the predefined tokens
 `CANREAD` for being allowed to read, or `CANWRITE` for being
