@@ -1,24 +1,24 @@
 
 # Example of use for checking permission within zephyr
 
-The permission check extension, named `PREM-CHECK` is intended
+The permission check extension, named `PERM-CHECK` is intended
 to bring the permission check feature of AFB framework to clients
-that are not inserted in the framework but that trust to use it
+that are not inserted in the framework, but that trust using it
 for permission checking.
 
 So let's explore that example.
 
 ## Description of the example
 
-An edge equipment is running a on an MCU too small to
+An edge equipment is running on an MCU too small to
 handle permission logic. That equipment is securely connected
 using a trusted connection to a server that can check the
 permissions using cynagora service.
 
 In that example, the MCU leverages afb-zephyr items that natively
 integrates redpesk framework permission checking. That native
-permission check is compiled in a such way that instead of calling
-directly cynagora service it calls a redpesk API for checking the
+permission check is compiled in a such way that, instead of calling
+directly cynagora service, it calls a redpesk API for checking the
 permission.
 
 Because redpesk APIs can be distributed across machines, the
@@ -66,7 +66,7 @@ The remaining of this document explains four things:
 
 1. What are redpesk permissions, how they are used and what they expect
 
-2. Compiling the zephyr example
+2. Compiling the Zephyr example
 
 3. Setting up the example
 
@@ -90,27 +90,27 @@ When the client runs on the same redpesk OS, the SMACK label can be used.
 Otherwise, the token is used as a session for checking the permissions.
 
 
-## Compiling the zephyr example
+## Compiling the Zephyr example
 
 The project [afb-zephyr-samples](https://github.com/redpesk-samples/afb-zephyr-samples)
-contains sample applications for integration of redpesk framework and zephyr OS.
+contains sample applications for integration of redpesk framework and Zephyr OS.
 
-The example **remote-io-control** when compiled with `CHECK_PERM` defined to be 1
-(see file `remote-io-control/src/main.c` line 63) adds feature to check the client permission
+The example **remote-io-control**, when compiled with `CHECK_PERM` set to 1
+(see file `remote-io-control/src/main.c` line 63), adds a feature to check the client permission
 when the client calls the verb `login`.
 
-Instead of using DNS, the example use a fixed IP address. That address is
-controlled by the macro `PREM_CHECK_IP` and can be set near line 70 of
+Instead of using DNS, the example uses a fixed IP address. That address is
+controlled by the macro `PERM_CHECK_IP` and can be set near line 70 of
 file `remote-io-control/src/main.c`
 
-Compilation of the zephyr samples is described in README files.
-It requires the zephyr module [afb-zephyr](https://github.com/redpesk-core/afb-zephyr)
+Compilation of the Zephyr samples is described in README files.
+It requires the Zephyr module [afb-zephyr](https://github.com/redpesk-core/afb-zephyr)
 
 
 ## Setting up the example
 
 That section helps to setup: cynagora service, permission checker service,
-zephyr example.
+Zephyr example.
 
 ### Start cynagora daemon
 
@@ -135,7 +135,7 @@ cynagora-admin set '*' CANWRITE '*' urn:redpesk:token:valid yes
 cynagora-admin set '*' CANWRITE '*' urn:redpesk:zephyr:partner:writer yes
 ```
 
-The session serves as security token so the client identifier and the user identifier
+The session serves as security token, so the client identifier and the user identifier
 can be anything. That is the meaning of the stars. Take care that stars might be expanded
 by the shell to the list of files in the current directory and as such must be in quotes.
 
@@ -146,7 +146,7 @@ The command `afb-binder` is the redpesk binder, it is provided by [redpesk SDK](
 https://docs.redpesk.bzh/docs/en/master/getting_started/host-configuration/docs/0-build-microservice-overview.html).
 
 The service that checks permissions is here ran in a separate instance, showing that
-the management of permissions can be on an instance different than the client instance.
+the management of permissions can be on an instance different from the client's instance.
 
 The permission checker runs as a binder extension. It must be compiled from
 the present project. It is loaded in the binder using the option `--extension`.
@@ -158,50 +158,50 @@ exported in RPC on TCP port 4444 using the option `--rpc-server`.
 afb-binder -p 3333 --extension libafb-perm-check-ext.so --rpc-server 'tcp:*:4444/perm'
 ```
 
-### Start zephyr
+### Start Zephyr
 
-Once you have compiled zephyr example (see above), you should flash
+Once you have compiled Zephyr example (see above), you should flash
 it to the target board (using `west flash`).
 
-Then to start zephyr, simply reset or boot the board.
+Then to start Zephyr, simply reset or boot the board.
 
 
 ## Testing and playing the example
 
-Because today, the program `afb-client` does not support
-RPC protocol, it is needed to start a redpesk binder that
+Because the program `afb-client` does not support
+RPC protocol at present, it is needed to start a redpesk binder that
 serves as relay between the command line tool `afb-client`
-and zephyr application.
+and Zephyr application.
 
-### Start the relay binder, client of zephyr
+### Start the relay binder, client of Zephyr
 
-The relay to zephyr application is done using the command below:
+The relay to Zephyr application is done using the command below:
 
 ```
 afb-binder --port 1111 --rpc-client=tcp:XXXXXX:1234/zephyr
 ```
 
-Where `XXXXXX` is the IP of the board.
+where `XXXXXX` is the IP of the board.
 
 This command tells to export as API zephyr the API replying in RPC
 protocol on port 1234 of IP XXXXXX.
 
-The binder then serves using protocol WSAPI at port 1111 and forwards to
-the board at `tcp:XXXXXX:1234` the calls to API **zephyr**.
+The binder then serves using protocol WSAPI at port 1111 and forwards the
+calls to API **zephyr** to the board at `tcp:XXXXXX:1234`.
 
-### Test and play the example
+### Test and run the example
 
-To play with the example, we use the program `afb-client` that connects
+To run the example, we use the program `afb-client` that connects
 to the relay binder. This is done using the command below:
 
 ```
 afb-client -t TOKEN localhost:1111/api
 ```
 
-Where `TOKEN` is the security token that presents the client.
-That token is used when checking permissions.
+where `TOKEN` is the security token presented by the client.
+This token is used when checking permissions.
 
-So to play the example, we should use the predefined tokens
+To run the example, we should use the predefined tokens
 `CANREAD` for being allowed to read, or `CANWRITE` for being
 allowed to write, or any other value (like `CANT`) that cannot
 do anything.
@@ -223,7 +223,7 @@ zephyr led toggle
 zephyr logoff
 ```
 
-The verb `state` require to be trusted. It just needs the permission `urn:redpesk:token:valid`.
+The verb `state` requires to be trusted. It just needs the permission `urn:redpesk:token:valid`.
 
 The verb `led` with the argument `toggle` requires to be trusted
 (permission `urn:redpesk:token:valid`) and to have the permission
@@ -233,13 +233,13 @@ The test of permission `urn:redpesk:zephyr:partner:writer` is done when the user
 calls `login`.
 
 
-## Exercice
+## Exercise
 
-The connection between zephyr application and permission checker service
+The connection between Zephyr application and permission checker service
 isn't secured because it is done without any protection. It is not difficult
 to use a TLS connection instead.
 
-How would do it using AFB settings?
+How would you do it using AFB settings?
 
 Useful links:
 
